@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="CSS/tabla.css"  >
+<title>Diccionario de Elementos Químicos</title>
+<style>
+</style>
+</head>
+<body>
+<header>
+  <h1>Diccionario de Elementos Químicos</h1>
+</header>
+
+<div class="container">
+  <div class="search-container">
+    <input type="text" id="search" placeholder="Buscar elemento por nombre o símbolo">
+    
+    <button onclick="inicio()">Inicio</button>
+  </div>
+  <div class="element-list" id="elementList"></div>
+
+  <div class="detail-panel" id="detailPanel" style="display:none;">
+    <h2 id="detailName"></h2>
+    <div class="property" id="detailSymbol"></div>
+    <div class="property" id="detailNumber"></div>
+    <div class="property" id="detailMass"></div>
+    <div class="property" id="detailType"></div>
+    <div class="property" id="detailPeriod"></div>
+    <div class="property" id="detailGroup"></div>
+    <div class="property"><strong>Enlaces y compuestos conocidos:</strong></div>
+    <ul class="compound-list" id="compoundList"></ul>
+  </div>
+</div>
+
+<script>
+// Datos de ejemplo, en producción se puede cargar desde JSON
+const elementos = [
+{"sim":"H","nombre":"Hidrógeno","num":1,"masa":"1.008","tipo":"no-metal","periodo":1,"grupo":1,"compuestos":["H2O","HCl","NH3"]},
+{"sim":"He","nombre":"Helio","num":2,"masa":"4.0026","tipo":"gas-noble","periodo":1,"grupo":18,"compuestos":["No forma compuestos comunes"]},
+{"sim":"Li","nombre":"Litio","num":3,"masa":"6.94","tipo":"metal-alcalino","periodo":2,"grupo":1,"compuestos":["Li2O","LiF"]},
+{"sim":"Be","nombre":"Berilio","num":4,"masa":"9.0122","tipo":"metal-alcalinoterreo","periodo":2,"grupo":2,"compuestos":["BeO","BeCl2"]},
+{"sim":"B","nombre":"Boro","num":5,"masa":"10.81","tipo":"metaloide","periodo":2,"grupo":13,"compuestos":["B2O3","BF3"]},
+{"sim":"C","nombre":"Carbono","num":6,"masa":"12.011","tipo":"no-metal","periodo":2,"grupo":14,"compuestos":["CO2","CH4","C6H12O6"]},
+{"sim":"N","nombre":"Nitrógeno","num":7,"masa":"14.007","tipo":"no-metal","periodo":2,"grupo":15,"compuestos":["NH3","NO2","N2O"]},
+{"sim":"O","nombre":"Oxígeno","num":8,"masa":"15.999","tipo":"no-metal","periodo":2,"grupo":16,"compuestos":["H2O","CO2","O3"]},
+{"sim":"F","nombre":"Flúor","num":9,"masa":"18.998","tipo":"halogeno","periodo":2,"grupo":17,"compuestos":["HF","CaF2"]},
+{"sim":"Ne","nombre":"Neón","num":10,"masa":"20.180","tipo":"gas-noble","periodo":2,"grupo":18,"compuestos":["No forma compuestos comunes"]},
+{"sim":"Na","nombre":"Sodio","num":11,"masa":"22.990","tipo":"metal-alcalino","periodo":3,"grupo":1,"compuestos":["NaCl","Na2O"]},
+{"sim":"Mg","nombre":"Magnesio","num":12,"masa":"24.305","tipo":"metal-alcalinoterreo","periodo":3,"grupo":2,"compuestos":["MgO","MgCl2"]},
+{"sim":"Al","nombre":"Aluminio","num":13,"masa":"26.982","tipo":"metal-post-transicion","periodo":3,"grupo":13,"compuestos":["Al2O3","AlCl3"]},
+{"sim":"Si","nombre":"Silicio","num":14,"masa":"28.085","tipo":"metaloide","periodo":3,"grupo":14,"compuestos":["SiO2","SiH4"]},
+{"sim":"P","nombre":"Fósforo","num":15,"masa":"30.974","tipo":"no-metal","periodo":3,"grupo":15,"compuestos":["P4O10","H3PO4"]},
+{"sim":"S","nombre":"Azufre","num":16,"masa":"32.06","tipo":"no-metal","periodo":3,"grupo":16,"compuestos":["SO2","H2S"]},
+{"sim":"Cl","nombre":"Cloro","num":17,"masa":"35.45","tipo":"halogeno","periodo":3,"grupo":17,"compuestos":["NaCl","HCl"]},
+{"sim":"Ar","nombre":"Argón","num":18,"masa":"39.948","tipo":"gas-noble","periodo":3,"grupo":18,"compuestos":["No forma compuestos comunes"]},
+{"sim":"K","nombre":"Potasio","num":19,"masa":"39.098","tipo":"metal-alcalino","periodo":4,"grupo":1,"compuestos":["KCl","K2O"]},
+{"sim":"Ca","nombre":"Calcio","num":20,"masa":"40.078","tipo":"metal-alcalinoterreo","periodo":4,"grupo":2,"compuestos":["CaO","CaCO3"]},
+{"sim":"Sc","nombre":"Escandio","num":21,"masa":"44.956","tipo":"metal-transicion","periodo":4,"grupo":3,"compuestos":["Sc2O3"]},
+{"sim":"Ti","nombre":"Titanio","num":22,"masa":"47.867","tipo":"metal-transicion","periodo":4,"grupo":4,"compuestos":["TiO2"]},
+{"sim":"V","nombre":"Vanadio","num":23,"masa":"50.942","tipo":"metal-transicion","periodo":4,"grupo":5,"compuestos":["V2O5"]},
+{"sim":"Cr","nombre":"Cromo","num":24,"masa":"51.996","tipo":"metal-transicion","periodo":4,"grupo":6,"compuestos":["Cr2O3","CrO3"]},
+{"sim":"Mn","nombre":"Manganeso","num":25,"masa":"54.938","tipo":"metal-transicion","periodo":4,"grupo":7,"compuestos":["MnO2","KMnO4"]},
+{"sim":"Fe","nombre":"Hierro","num":26,"masa":"55.845","tipo":"metal-transicion","periodo":4,"grupo":8,"compuestos":["Fe2O3","Fe3O4","FeCl3"]},
+{"sim":"Co","nombre":"Cobalto","num":27,"masa":"58.933","tipo":"metal-transicion","periodo":4,"grupo":9,"compuestos":["CoCl2","CoO"]},
+{"sim":"Ni","nombre":"Níquel","num":28,"masa":"58.693","tipo":"metal-transicion","periodo":4,"grupo":10,"compuestos":["NiO","NiCl2"]},
+{"sim":"Cu","nombre":"Cobre","num":29,"masa":"63.546","tipo":"metal-transicion","periodo":4,"grupo":11,"compuestos":["CuO","CuSO4","CuCl2"]},
+{"sim":"Zn","nombre":"Zinc","num":30,"masa":"65.38","tipo":"metal-transicion","periodo":4,"grupo":12,"compuestos":["ZnO","ZnCl2"]},
+{"sim":"Ga","nombre":"Galio","num":31,"masa":"69.723","tipo":"metal-post-transicion","periodo":4,"grupo":13,"compuestos":["Ga2O3"]},
+{"sim":"Ge","nombre":"Germanio","num":32,"masa":"72.63","tipo":"metaloide","periodo":4,"grupo":14,"compuestos":["GeO2"]},
+{"sim":"As","nombre":"Arsénico","num":33,"masa":"74.922","tipo":"metaloide","periodo":4,"grupo":15,"compuestos":["As2O3"]},
+{"sim":"Se","nombre":"Selenio","num":34,"masa":"78.971","tipo":"no-metal","periodo":4,"grupo":16,"compuestos":["SeO2"]},
+{"sim":"Br","nombre":"Bromo","num":35,"masa":"79.904","tipo":"halogeno","periodo":4,"grupo":17,"compuestos":["HBr"]},
+{"sim":"Kr","nombre":"Kriptón","num":36,"masa":"83.798","tipo":"gas-noble","periodo":4,"grupo":18,"compuestos":["No forma compuestos comunes"]},
+{"sim":"Rb","nombre":"Rubidio","num":37,"masa":"85.468","tipo":"metal-alcalino","periodo":5,"grupo":1,"compuestos":["RbCl"]},
+{"sim":"Sr","nombre":"Estroncio","num":38,"masa":"87.62","tipo":"metal-alcalinoterreo","periodo":5,"grupo":2,"compuestos":["SrO","SrCl2"]},
+{"sim":"Y","nombre":"Itrio","num":39,"masa":"88.906","tipo":"metal-transicion","periodo":5,"grupo":3,"compuestos":["Y2O3"]},
+{"sim":"Zr","nombre":"Circonio","num":40,"masa":"91.224","tipo":"metal-transicion","periodo":5,"grupo":4,"compuestos":["ZrO2"]},
+{"sim":"Nb","nombre":"Niobio","num":41,"masa":"92.906","tipo":"metal-transicion","periodo":5,"grupo":5,"compuestos":["Nb2O5"]},
+{"sim":"Mo","nombre":"Molibdeno","num":42,"masa":"95.95","tipo":"metal-transicion","periodo":5,"grupo":6,"compuestos":["MoO3"]},
+{"sim":"Tc","nombre":"Tecnecio","num":43,"masa":"98","tipo":"metal-transicion","periodo":5,"grupo":7,"compuestos":["Tc2O7"]},
+{"sim":"Ru","nombre":"Rutenio","num":44,"masa":"101.07","tipo":"metal-transicion","periodo":5,"grupo":8,"compuestos":["RuO4"]},
+{"sim":"Rh","nombre":"Rodio","num":45,"masa":"102.91","tipo":"metal-transicion","periodo":5,"grupo":9,"compuestos":["RhCl3"]},
+{"sim":"Pd","nombre":"Paladio","num":46,"masa":"106.42","tipo":"metal-transicion","periodo":5,"grupo":10,"compuestos":["PdCl2"]},
+{"sim":"Ag","nombre":"Plata","num":47,"masa":"107.87","tipo":"metal-transicion","periodo":5,"grupo":11,"compuestos":["AgNO3","AgCl"]},
+{"sim":"Cd","nombre":"Cadmio","num":48,"masa":"112.41","tipo":"metal-transicion","periodo":5,"grupo":12,"compuestos":["CdO","CdCl2"]},
+{"sim":"In","nombre":"Indio","num":49,"masa":"114.82","tipo":"metal-post-transicion","periodo":5,"grupo":13,"compuestos":["In2O3"]},
+{"sim":"Sn","nombre":"Estaño","num":50,"masa":"118.71","tipo":"metal-post-transicion","periodo":5,"grupo":14,"compuestos":["SnO2","SnCl4"]},
+{"sim":"Sb","nombre":"Antimonio","num":51,"masa":"121.76","tipo":"metaloide","periodo":5,"grupo":15,"compuestos":["Sb2O3","SbCl3"]},
+{"sim":"Te","nombre":"Telurio","num":52,"masa":"127.60","tipo":"metaloide","periodo":5,"grupo":16,"compuestos":["TeO2"]},
+{"sim":"I","nombre":"Yodo","num":53,"masa":"126.90","tipo":"halogeno","periodo":5,"grupo":17,"compuestos":["I2","HI"]},
+{"sim":"Xe","nombre":"Xenón","num":54,"masa":"131.29","tipo":"gas-noble","periodo":5,"grupo":18,"compuestos":["XeF2","XeO3"]},
+{"sim":"Cs","nombre":"Cesio","num":55,"masa":"132.91","tipo":"metal-alcalino","periodo":6,"grupo":1,"compuestos":["CsCl"]},
+{"sim":"Ba","nombre":"Bario","num":56,"masa":"137.33","tipo":"metal-alcalinoterreo","periodo":6,"grupo":2,"compuestos":["BaO","BaSO4"]},
+{"sim":"La","nombre":"Lantano","num":57,"masa":"138.91","tipo":"lantanido","periodo":6,"grupo":3,"compuestos":["La2O3"]},
+{"sim":"Ce","nombre":"Cerio","num":58,"masa":"140.12","tipo":"lantanido","periodo":6,"grupo":3,"compuestos":["CeO2"]},
+{"sim":"Pr","nombre":"Praseodimio","num":59,"masa":"140.91","tipo":"lantanido","periodo":6,"grupo":3,"compuestos":["Pr6O11"]},
+{"sim":"Nd","nombre":"Neodimio","num":60,"masa":"144.24","tipo":"lantanido","periodo":6,"grupo":3,"compuestos":["Nd2O3"]},
+{"sim":"Pm","nombre":"Prometio","num":61,"masa":"145","tipo":"lantanido","periodo":6,"grupo":3,"compuestos":["Pm2O3"]},
+{"sim":"Sm","nombre":"Samario","num":62,"masa":"150.36","tipo":"lantanido","periodo":6,"grupo":3,"compuestos":["Sm2O3"]},
+{"sim":"Eu","nombre":"Europio","num":63,"masa":"151.96","tipo":"lantanido","periodo":6,"grupo":3,"compuestos":["Eu2O3"]},
+{"sim":"Gd","nombre":"Gadolinio","num":64,"masa":"157.25","tipo":"lantanido","periodo":6,"grupo":3,"compuestos":["Gd2O3"]},
+{"sim":"Tb","nombre":"Terbio","num":65,"masa":"158.93","tipo":"lantanido","periodo":6,"grupo":3,"compuestos":["Tb4O7"]},
+{"sim":"Dy","nombre":"Disprosio","num":66,"masa":"162.50","tipo":"lantanido","periodo":6,"grupo":3,"compuestos":["Dy2O3"]},
+{"sim":"Ho","nombre":"Holmio","num":67,"masa":"164.93","tipo":"lantanido","periodo":6,"grupo":3,"compuestos":["Ho2O3"]},
+{"sim":"Er","nombre":"Erbio","num":68,"masa":"167.26","tipo":"lantanido","periodo":6,"grupo":3,"compuestos":["Er2O3"]},
+{"sim":"Tm","nombre":"Tulio","num":69,"masa":"168.93","tipo":"lantanido","periodo":6,"grupo":3,"compuestos":["Tm2O3"]},
+{"sim":"Yb","nombre":"Iterbio","num":70,"masa":"173.04","tipo":"lantanido","periodo":6,"grupo":3,"compuestos":["Yb2O3"]},
+{"sim":"Lu","nombre":"Lutecio","num":71,"masa":"174.97","tipo":"lantanido","periodo":6,"grupo":3,"compuestos":["Lu2O3"]},
+{"sim":"Hf","nombre":"Hafnio","num":72,"masa":"178.49","tipo":"metal-transicion","periodo":6,"grupo":4,"compuestos":["HfO2"]},
+{"sim":"Ta","nombre":"Tantalio","num":73,"masa":"180.95","tipo":"metal-transicion","periodo":6,"grupo":5,"compuestos":["Ta2O5"]},
+{"sim":"W","nombre":"Wolframio","num":74,"masa":"183.84","tipo":"metal-transicion","periodo":6,"grupo":6,"compuestos":["WO3"]},
+{"sim":"Re","nombre":"Renio","num":75,"masa":"186.21","tipo":"metal-transicion","periodo":6,"grupo":7,"compuestos":["Re2O7"]},
+{"sim":"Os","nombre":"Osmio","num":76,"masa":"190.23","tipo":"metal-transicion","periodo":6,"grupo":8,"compuestos":["OsO4"]},
+{"sim":"Ir","nombre":"Iridio","num":77,"masa":"192.22","tipo":"metal-transicion","periodo":6,"grupo":9,"compuestos":["IrCl3"]},
+{"sim":"Pt","nombre":"Platino","num":78,"masa":"195.08","tipo":"metal-transicion","periodo":6,"grupo":10,"compuestos":["PtCl2"]},
+{"sim":"Au","nombre":"Oro","num":79,"masa":"196.97","tipo":"metal-transicion","periodo":6,"grupo":11,"compuestos":["AuCl3"]},
+{"sim":"Hg","nombre":"Mercurio","num":80,"masa":"200.59","tipo":"metal-transicion","periodo":6,"grupo":12,"compuestos":["HgO"]},
+{"sim":"Tl","nombre":"Talio","num":81,"masa":"204.38","tipo":"metal-post-transicion","periodo":6,"grupo":13,"compuestos":["Tl2O3"]},
+{"sim":"Pb","nombre":"Plomo","num":82,"masa":"207.2","tipo":"metal-post-transicion","periodo":6,"grupo":14,"compuestos":["PbO","PbS"]},
+{"sim":"Bi","nombre":"Bismuto","num":83,"masa":"208.98","tipo":"metal-post-transicion","periodo":6,"grupo":15,"compuestos":["Bi2O3"]},
+{"sim":"Po","nombre":"Polonio","num":84,"masa":"209","tipo":"metaloide","periodo":6,"grupo":16,"compuestos":["PoO2"]},
+{"sim":"At","nombre":"Astato","num":85,"masa":"210","tipo":"halogeno","periodo":6,"grupo":17,"compuestos":["AtCl"]},
+{"sim":"Rn","nombre":"Radón","num":86,"masa":"222","tipo":"gas-noble","periodo":6,"grupo":18,"compuestos":["No forma compuestos comunes"]},
+{"sim":"Fr","nombre":"Francio","num":87,"masa":"223","tipo":"metal-alcalino","periodo":7,"grupo":1,"compuestos":["FrCl"]},
+{"sim":"Ra","nombre":"Radio","num":88,"masa":"226","tipo":"metal-alcalinoterreo","periodo":7,"grupo":2,"compuestos":["RaCl2"]},
+{"sim":"Ac","nombre":"Actinio","num":89,"masa":"227","tipo":"actinido","periodo":7,"grupo":3,"compuestos":["Ac2O3"]},
+{"sim":"Th","nombre":"Torio","num":90,"masa":"232.04","tipo":"actinido","periodo":7,"grupo":3,"compuestos":["ThO2"]},
+{"sim":"Pa","nombre":"Protactinio","num":91,"masa":"231.04","tipo":"actinido","periodo":7,"grupo":3,"compuestos":["Pa2O5"]},
+{"sim":"U","nombre":"Uranio","num":92,"masa":"238.03","tipo":"actinido","periodo":7,"grupo":3,"compuestos":["UO2","U3O8"]},
+{"sim":"Np","nombre":"Neptunio","num":93,"masa":"237","tipo":"actinido","periodo":7,"grupo":3,"compuestos":["NpO2"]},
+{"sim":"Pu","nombre":"Plutonio","num":94,"masa":"244","tipo":"actinido","periodo":7,"grupo":3,"compuestos":["PuO2"]},
+{"sim":"Am","nombre":"Americio","num":95,"masa":"243","tipo":"actinido","periodo":7,"grupo":3,"compuestos":["AmO2"]},
+{"sim":"Cm","nombre":"Curio","num":96,"masa":"247","tipo":"actinido","periodo":7,"grupo":3,"compuestos":["CmO2"]},
+{"sim":"Bk","nombre":"Berkelio","num":97,"masa":"247","tipo":"actinido","periodo":7,"grupo":3,"compuestos":["BkO2"]},
+{"sim":"Cf","nombre":"Californio","num":98,"masa":"251","tipo":"actinido","periodo":7,"grupo":3,"compuestos":["CfO2"]},
+{"sim":"Es","nombre":"Einstenio","num":99,"masa":"252","tipo":"actinido","periodo":7,"grupo":3,"compuestos":["EsO2"]},
+{"sim":"Fm","nombre":"Fermio","num":100,"masa":"257","tipo":"actinido","periodo":7,"grupo":3,"compuestos":["FmO2"]},
+{"sim":"Md","nombre":"Mendelevio","num":101,"masa":"258","tipo":"actinido","periodo":7,"grupo":3,"compuestos":["MdO2"]},
+{"sim":"No","nombre":"Nobelio","num":102,"masa":"259","tipo":"actinido","periodo":7,"grupo":3,"compuestos":["NoO2"]},
+{"sim":"Lr","nombre":"Lawrencio","num":103,"masa":"262","tipo":"actinido","periodo":7,"grupo":3,"compuestos":["LrO2"]},
+{"sim":"Rf","nombre":"Rutherfordio","num":104,"masa":"267","tipo":"metal-transicion","periodo":7,"grupo":4,"compuestos":["RfO2"]},
+{"sim":"Db","nombre":"Dubnio","num":105,"masa":"270","tipo":"metal-transicion","periodo":7,"grupo":5,"compuestos":["DbO2"]},
+{"sim":"Sg","nombre":"Seaborgio","num":106,"masa":"271","tipo":"metal-transicion","periodo":7,"grupo":6,"compuestos":["SgO2"]},
+{"sim":"Bh","nombre":"Bohrio","num":107,"masa":"270","tipo":"metal-transicion","periodo":7,"grupo":7,"compuestos":["BhO2"]},
+{"sim":"Hs","nombre":"Hassio","num":108,"masa":"277","tipo":"metal-transicion","periodo":7,"grupo":8,"compuestos":["HsO2"]},
+{"sim":"Mt","nombre":"Meitnerio","num":109,"masa":"278","tipo":"metal-transicion","periodo":7,"grupo":9,"compuestos":["MtO2"]},
+{"sim":"Ds","nombre":"Darmstadtio","num":110,"masa":"281","tipo":"metal-transicion","periodo":7,"grupo":10,"compuestos":["DsO2"]},
+{"sim":"Rg","nombre":"Roentgenio","num":111,"masa":"282","tipo":"metal-transicion","periodo":7,"grupo":11,"compuestos":["RgO2"]},
+{"sim":"Cn","nombre":"Copernicio","num":112,"masa":"285","tipo":"metal-post-transicion","periodo":7,"grupo":12,"compuestos":["CnO2"]},
+{"sim":"Nh","nombre":"Nihonio","num":113,"masa":"286","tipo":"metal-post-transicion","periodo":7,"grupo":13,"compuestos":["NhO2"]},
+{"sim":"Fl","nombre":"Flerovio","num":114,"masa":"289","tipo":"metal-post-transicion","periodo":7,"grupo":14,"compuestos":["FlO2"]},
+{"sim":"Mc","nombre":"Moscovio","num":115,"masa":"288","tipo":"metal-post-transicion","periodo":7,"grupo":15,"compuestos":["McO2"]},
+{"sim":"Lv","nombre":"Livermorio","num":116,"masa":"293","tipo":"metal-post-transicion","periodo":7,"grupo":16,"compuestos":["LvO2"]},
+{"sim":"Ts","nombre":"Tenesino","num":117,"masa":"294","tipo":"halogeno","periodo":7,"grupo":17,"compuestos":["TsO2"]},
+{"sim":"Og","nombre":"Oganesón","num":118,"masa":"294","tipo":"gas-noble","periodo":7,"grupo":18,"compuestos":["No forma compuestos comunes"]}
+]
+
+// Mostrar elementos en la lista
+const elementList = document.getElementById('elementList');
+elementos.forEach(el=>{
+  const div = document.createElement('div');
+  div.className = 'element-item ' + el.tipo;
+  div.innerHTML = `<div class="element-symbol">${el.sim}</div>
+                   <div class="element-name">${el.nombre}</div>`;
+  div.onclick = ()=>showDetail(el);
+  elementList.appendChild(div);
+});
+
+// Mostrar detalles
+function showDetail(el){
+  document.getElementById('detailPanel').style.display='block';
+  document.getElementById('detailName').textContent=el.nombre;
+  document.getElementById('detailSymbol').textContent='Símbolo: '+el.sim;
+  document.getElementById('detailNumber').textContent='Número atómico: '+el.num;
+  document.getElementById('detailMass').textContent='Masa atómica: '+el.masa;
+  document.getElementById('detailType').textContent='Tipo: '+el.tipo;
+  document.getElementById('detailPeriod').textContent='Periodo: '+el.periodo;
+  document.getElementById('detailGroup').textContent='Grupo: '+el.grupo;
+  const compList = document.getElementById('compoundList');
+  compList.innerHTML='';
+  el.compuestos.forEach(c=>{
+    const li = document.createElement('li');
+    li.textContent=c;
+    compList.appendChild(li);
+  });
+}
+
+// Buscar elementos
+const searchInput = document.getElementById('search');
+searchInput.addEventListener('input',()=>{
+  const query = searchInput.value.toLowerCase();
+  elementList.innerHTML='';
+  elementos.filter(el=>el.nombre.toLowerCase().includes(query)||el.sim.toLowerCase().includes(query))
+           .forEach(el=>{
+             const div = document.createElement('div');
+             div.className = 'element-item ' + el.tipo;
+             div.innerHTML = `<div class="element-symbol">${el.sim}</div>
+                              <div class="element-name">${el.nombre}</div>`;
+             div.onclick = ()=>showDetail(el);
+             elementList.appendChild(div);
+           });
+});
+
+  function inicio() {
+    // Redirigir al inicio
+    window.location.href = "index.html";
+  };
+</script>
+</body>
+</html>

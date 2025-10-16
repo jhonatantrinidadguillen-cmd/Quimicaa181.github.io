@@ -1,0 +1,106 @@
+
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #0d1b2a;
+    color: #fff;
+  }
+  header {
+    text-align: center;
+    padding: 20px;
+    background: #1b263b;
+  }
+  h1 { margin: 0; color: #00ffff; }
+  .container {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    max-width: 1200px;
+    margin: auto;
+  }
+  .search-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  input[type="text"] {
+    padding: 8px;
+    width: 200px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+  }
+  .element-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 6px;
+  }
+  .element-item {
+    background: #1b263b;
+    border-radius: 6px;
+    text-align: center;
+    padding: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .element-item:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px #00ffff;
+    z-index: 5;
+  }
+  .element-symbol {
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 2px;
+  }
+  .element-name {
+    font-size: 12px;
+  }
+  .detail-panel {
+    margin-top: 20px;
+    background: #162447;
+    padding: 15px;
+    border-radius: 10px;
+  }
+  .detail-panel h2 { margin-top: 0; color: #00ffff; }
+  .property { margin-bottom: 6px; }
+  .compound-list {
+    margin-top: 10px;
+    padding-left: 20px;
+  }
+  
+button {
+  background: cyan;
+  color: black;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+  margin: 2px;
+}
+button:hover { background: lime; }
+
+  .compound-list li { margin-bottom: 4px; }
+  /* Colores por tipo */
+  .no-metal { background-color: #4ecdc4; }
+  .gas-noble { background-color: #ff6b6b; }
+  .metal-alcalino { background-color: #ffe66d; }
+  .metal-alcalinoterreo { background-color: #ffd166; }
+  .metaloide { background-color: #6a994e; }
+  .halogeno { background-color: #c77dff; }
+  .metal-transicion { background-color: #118ab2; }
+  .metal-post-transicion { background-color: #073b4c; }
+  .lantanido { background-color: #ef476f; }
+  .actinido { background-color: #9b5de5; }
+
+  /* Responsivo */
+  @media (max-width: 768px) {
+    .element-list { grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); }
+    input[type="text"] { width: 150px; }
+  }

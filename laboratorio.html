@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Laboratorio Virtual de Química</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="CSS/laboratorio.css"  >
+</head>
+<body>
+
+  <h1>🧪 Laboratorio Virtual de Química</h1>
+
+  <div class="tabla" id="tabla"></div>
+
+  <div class="seleccionados" id="seleccionados"></div>
+
+  <div style="margin:10px;">
+    <button id="mezclar">Mezclar Elementos</button>
+    <button id="borrar">Borrar Selección</button>
+    <button onclick="inicio()">Inicio</button>
+
+  </div>
+
+  <div id="resultado"></div>
+
+  <script>
+    let seleccion = [];
+    const tabla = document.getElementById('tabla');
+    const seleccionados = document.getElementById('seleccionados');
+    const resultado = document.getElementById('resultado');
+
+    // ---- Cargar elementos desde JSON ----
+    fetch('JSON/elementos.json')
+      .then(res => res.json())
+      .then(elementos => {
+        elementos.forEach(el => {
+          const div = document.createElement('div');
+          div.className = 'elemento ' + el.tipo;
+          div.style.gridColumn = el.x;
+          div.style.gridRow = el.y;
+          div.innerHTML = `<div class="nombre-elemento">${el.nombre}</div>
+                           <div class="simbolo">${el.sim}</div>`;
+          div.onclick = () => {
+            if(seleccion.length < 3){ 
+              seleccion.push(el.sim); 
+              actualizarSeleccion();
+            } else alert('Solo puedes seleccionar hasta 3 elementos.');
+          };
+          tabla.appendChild(div);
+        });
+      });
+
+    // ---- Combinaciones ----
+  const combinaciones = {
+  "H+O":"💧 Agua (H₂O)",
+  "Na+Cl":"🧂 Cloruro de sodio (Sal común)",
+  "C+O":"🌫️ Dióxido de carbono (CO₂)",
+  "H+S":"💨 Sulfuro de hidrógeno (H₂S)",
+  "Fe+O":"🧲 Óxido de hierro (Fe₂O₃)",
+  "Ca+O":"⚙️ Óxido de calcio (Cal viva)",
+  "C+H":"🔥 Metano (CH₄)",
+  "N+H":"🌬️ Amoníaco (NH₃)",
+  "Na+O":"🧪 Óxido de sodio (Na₂O)",
+  "K+Cl":"⚡ Cloruro de potasio (KCl)",
+  "H+Cl":"🧫 Ácido clorhídrico (HCl)",
+  "C+H+O":"☁️ Glucosa (C₆H₁₂O₆)",
+  "S+O":"🌋 Dióxido de azufre (SO₂)",
+  "N+O":"🌫️ Óxido nítrico (NO)",
+  "Cu+S":"🔶 Sulfuro de cobre (CuS)",
+  "Ag+S":"⚫ Sulfuro de plata (Ag₂S)",
+  "Pb+O":"🔩 Óxido de plomo (PbO)",
+  "H+N+O":"💥 Ácido nítrico (HNO₃)",
+  "H+C+O":"🔥 Etanol (C₂H₅OH)",
+  "Na+H":"⚡ Hidruro de sodio (NaH)",
+  "K+O":"🔥 Óxido de potasio (K₂O)",
+  "Al+O":"🔩 Óxido de aluminio (Al₂O₃)",
+  "Fe+C":"⚙️ Acero (Fe+C)",
+  "Si+O":"🔹 Dióxido de silicio (SiO₂)",
+  "H+O+S":"🧪 Ácido sulfúrico (H₂SO₄)",
+  "Cu+O":"🟠 Óxido de cobre (CuO)",
+  "Mg+O":"✨ Óxido de magnesio (MgO)",
+  "Zn+O":"⚙️ Óxido de zinc (ZnO)",
+  "Ca+CO":"🪨 Carbonato de calcio (CaCO₃)",
+  "H+C+N+O":"💊 Cafeína (C₈H₁₀N₄O₂)",
+  "C+H+N+O":"🧪 Aspirina (C₉H₈O₄)",
+  "H+P+O":"🧫 Ácido fosfórico (H₃PO₄)",
+  "K+Br":"🟡 Bromuro de potasio (KBr)",
+  "Na+F":"🧂 Fluoruro de sodio (NaF)",
+  "C+H+O+N":"💊 Sacarina (C₇H₅NO₃S)",
+  "Ag+Cl":"⚪ Cloruro de plata (AgCl)",
+  "Pb+S":"⚫ Sulfuro de plomo (PbS)",
+  "Fe+S":"🔶 Sulfuro de hierro (FeS)",
+  "Cu+Cl":"🟢 Cloruro de cobre (CuCl₂)",
+  "H+N+S":"🧪 Ácido tiocianico (HNCS)",
+  "Na+S":"⚡ Sulfuro de sodio (Na₂S)",
+  "K+N":"💨 Nitruro de potasio (K₃N)",
+  "Mg+Cl":"🟢 Cloruro de magnesio (MgCl₂)",
+  "H+Br":"🧫 Ácido bromhídrico (HBr)",
+  "H+I":"🧪 Ácido yodhídrico (HI)",
+  "Cl+H2O":"🧊 Hipoclorito (HClO)",
+  "Na+H2O":"💥 Hidróxido de sodio (NaOH) + H₂",
+  "Ca+H2O":"💧 Hidróxido de calcio (Ca(OH)₂) + H₂",
+  "K+H2O":"🔥 Hidróxido de potasio (KOH) + H₂",
+  "Al+HCl":"🧪 Cloruro de aluminio (AlCl₃) + H₂",
+  "Zn+HCl":"⚡ Cloruro de zinc (ZnCl₂) + H₂",
+  "Fe+Cl2":"🧲 Cloruro de hierro (FeCl₃)",
+  "Cu+O2":"🟠 Óxido de cobre (CuO)",
+  "Mg+O2":"✨ Óxido de magnesio (MgO)",
+  "P+O2":"🌋 P₄O₁₀",
+  "S+Cl2":"🧪 Cloruro de azufre (S₂Cl₂)",
+  "N+O2":"💨 N₂O",
+  "C+O2":"🔥 CO₂",
+  "H+F2":"⚡ Fluoruro de hidrógeno (HF)",
+  "K+F":"🟢 Fluoruro de potasio (KF)",
+  "Na+Br":"🟡 Bromuro de sodio (NaBr)",
+  "Ca+S":"⚙️ Sulfuro de calcio (CaS)",
+  "Al+S":"🧫 Sulfuro de aluminio (Al₂S₃)",
+  "Fe+S2":"🔶 Sulfuro de hierro (FeS₂)",
+  "Cu+Br2":"🟠 Bromuro de cobre (CuBr₂)",
+  "Ag+Br":"⚪ Bromuro de plata (AgBr)",
+  "Pb+Cl2":"🔩 Cloruro de plomo (PbCl₂)",
+  "H+NO3":"💥 Ácido nítrico (HNO₃)",
+  "C+H2":"🔥 Metano (CH₄)",
+  "N+H2":"🌬️ Amoníaco (NH₃)",
+  "Na+S+O":"⚡ Sulfato de sodio (Na₂SO₄)",
+  "K+S+O":"🔥 Sulfato de potasio (K₂SO₄)",
+  "Mg+S+O":"✨ Sulfato de magnesio (MgSO₄)",
+  "Ca+S+O":"🪨 Sulfato de calcio (CaSO₄)",
+  "H+CO3":"🧫 Bicarbonato de hidrógeno (HCO₃⁻)",
+  "Na+CO3":"🧂 Carbonato de sodio (Na₂CO₃)",
+  "K+CO3":"⚡ Carbonato de potasio (K₂CO₃)",
+  "Ca+CO3":"🪨 Carbonato de calcio (CaCO₃)",
+  "Ba+CO3":"💎 Carbonato de bario (BaCO₃)",
+  "Al+OH":"🧪 Hidróxido de aluminio (Al(OH)₃)",
+  "Fe+OH":"🧲 Hidróxido de hierro (Fe(OH)₃)",
+  "Cu+OH":"🟠 Hidróxido de cobre (Cu(OH)₂)",
+  "Mg+OH":"✨ Hidróxido de magnesio (Mg(OH)₂)",
+  "Zn+OH":"⚙️ Hidróxido de zinc (Zn(OH)₂)",
+  "Ca+OH":"🪨 Hidróxido de calcio (Ca(OH)₂)",
+  "Na+OH":"💥 Hidróxido de sodio (NaOH)",
+  "K+OH":"🔥 Hidróxido de potasio (KOH)",
+  "NH4+Cl":"🧫 Cloruro de amonio (NH₄Cl)",
+  "NH4+NO3":"💥 Nitrato de amonio (NH₄NO₃)",
+  "H2+O2":"💧 Agua (H₂O)",
+  "C+Cl2":"🧪 Cloruro de carbono (CCl₄)",
+  "Si+Cl4":"🔹 Tetracloruro de silicio (SiCl₄)",
+  "P+Cl3":"🧫 Tricloruro de fósforo (PCl₃)",
+  "Al+Cl3":"🧪 Cloruro de aluminio (AlCl₃)",
+  "Fe+Cl3":"🧲 Cloruro férrico (FeCl₃)",
+  "Cu+Cl":"🟠 Cloruro de cobre (CuCl)",
+  "Hg+S":"⚡ Sulfuro de mercurio (HgS)",
+  "Pb+S2":"🔩 Sulfuro de plomo (PbS₂)",
+  "Ag+NO3":"⚪ Nitrato de plata (AgNO₃)",
+  "Ba+SO4":"💎 Sulfato de bario (BaSO₄)",
+  "Ca+SO4":"🪨 Sulfato de calcio (CaSO₄)",
+  "Mg+SO4":"✨ Sulfato de magnesio (MgSO₄)",
+  "K+NO3":"🔥 Nitrato de potasio (KNO₃)",
+  "Na+NO3":"🧂 Nitrato de sodio (NaNO₃)",
+  "NH3+HCl":"🌬️ Cloruro de amonio (NH₄Cl)",
+  "H2+Cl2":"💥 Cloruro de hidrógeno (HCl)",
+  "C+O+H2":"🔥 Formaldehído (CH₂O)",
+  "C+O+H2O":"☁️ Ácido fórmico (HCOOH)",
+  "C+H2O":"🧪 Metanol (CH₃OH)",
+  "C+H2+O2":"🔥 Etanol (C₂H₅OH)",
+  "C+H+N+O+S":"💊 Penicilina (C₁₆H₁₈N₂O₄S)"
+};
+
+    // ---- Actualizar selección ----
+    function actualizarSeleccion() {
+      seleccionados.innerHTML = '';
+      seleccion.forEach(el=>{
+        const span = document.createElement('span');
+        span.className = 'seleccionado';
+        span.textContent = el;
+        seleccionados.appendChild(span);
+      });
+    }
+
+    // ---- Botón Mezclar ----
+    document.getElementById('mezclar').onclick = ()=>{
+      if(seleccion.length < 2){
+        resultado.textContent = "Selecciona al menos 2 elementos";
+        return;
+      }
+      // Buscar combinación exacta (orden no importa)
+      const key = Object.keys(combinaciones).find(k => {
+        const elems = k.split('+');
+        return elems.every(e => seleccion.includes(e)) && elems.length === seleccion.length;
+      });
+      resultado.textContent = key ? combinaciones[key] : "❌ No hay reacción conocida";
+      seleccion = [];
+      actualizarSeleccion();
+    };
+
+    // ---- Botón Borrar ----
+    document.getElementById('borrar').onclick = ()=>{
+      seleccion = [];
+      actualizarSeleccion();
+      resultado.textContent = "";
+    };
+
+
+    
+  function inicio() {
+    // Redirigir al inicio
+    window.location.href = "index.html";
+  };
+
+  </script>
+
+</body>
+</html>

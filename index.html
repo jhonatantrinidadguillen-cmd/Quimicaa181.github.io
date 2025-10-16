@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="CSS/index.css"  >
+<title>Menú Principal - Juegos de Química</title>
+</head>
+<body>
+
+  <h1>🔬 Juegos de Química</h1>
+
+  <div class="menu">
+    <button onclick="irLaboratorio()">🧪 Ir al Laboratorio</button>
+    <button onclick="verTabla()">📊 Conocer la Tabla Periódica</button>
+    <button onclick="otroJuego()">🎮 Otro Juego de Química</button>
+  </div>
+
+  <div class="descripcion">
+    Bienvenido al portal de juegos y aprendizaje de química. 
+    Desde aquí puedes explorar la tabla periódica, experimentar en el laboratorio virtual o probar otros juegos educativos relacionados con química.
+  </div>
+
+<script>
+  function irLaboratorio() {
+    // Redirigir a la página del laboratorio
+    window.location.href = "laboratorio.html";
+  }
+
+  function verTabla() {
+    // Redirigir a la página con la tabla periódica
+    window.location.href = "tabla.html";
+  }
+
+  function otroJuego() {
+    // Redirigir a otro juego
+    window.location.href = "quis.html";
+  }
+</script>
+
+</body>
+</html>
